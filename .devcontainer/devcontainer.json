@@ -1,0 +1,39 @@
+{
+	"name": "TeraFlashPy",
+	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"charliermarsh.ruff",
+				"tamasfe.even-better-toml",
+				"redhat.vscode-yaml",
+				"visualstudioexptteam.vscodeintellicode"
+				// "ryanluker.vscode-coverage-gutters",
+			],
+			"settings": {
+				"editor.codeActionsOnSave": {
+					"source.fixAll": true,
+					"source.organizeImports": true
+				},
+				"[python]": {
+					"editor.formatOnSave": true,
+					"editor.defaultFormatter": "charliermarsh.ruff"
+				},
+				"python.analysis.extraPaths": [
+					"src/"
+				],
+				"python.analysis.inlayHints.functionReturnTypes": true,
+				"python.analysis.inlayHints.variableTypes": true,
+				"python.analysis.inlayHints.pytestParameters": true,
+				"python.analysis.inlayHints.callArgumentNames": "partial",
+				"[toml]": {
+					"editor.formatOnSave": true
+				},
+				"editor.rulers": [
+					120
+				]
+			}
+		}
+	}
+}

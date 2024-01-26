@@ -1,0 +1,17 @@
+.venv/
+.env
+
+__pycache__/
+*.egg-info/
+build/
+dist/
+
+tmp*/
+
+.ruff_cache/
+.pytest_cache/
+.coverage
+.tox/
+
+data/
+/.vscode/settings.json

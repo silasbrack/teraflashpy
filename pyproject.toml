@@ -1,0 +1,23 @@
+[project]
+name = "teraflashpy"
+version = "0.1.0"
+authors = [{ name = "Silas Brack", email = "silasbrack@gmail.com" }]
+description = ""
+license = { text = "MIT" }
+readme = "README.md"
+dependencies = ["pydantic", "numpy", "pydantic-numpy"]
+
+[project.optional-dependencies]
+dev = ["pre-commit", "ruff", "ruff-lsp", "pyright"]
+
+[build-system]
+requires = ["setuptools", "wheel"] # PEP 508 specifications.
+
+[tool.setuptools.packages.find]
+where = ["src/teraflashpy"]
+
+[tool.ruff]
+line-length = 120
+ignore-init-module-imports = true
+select = ["ALL"]
+ignore = ["D"]
