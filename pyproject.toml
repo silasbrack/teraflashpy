@@ -5,7 +5,10 @@ authors = [{ name = "Silas Brack", email = "silasbrack@gmail.com" }]
 description = ""
 license = { text = "MIT" }
 readme = "README.md"
-dependencies = ["pydantic", "numpy", "pydantic-numpy"]
+dependencies = ["typer[all]", "pydantic", "numpy", "pydantic-numpy"]
+
+[project.scripts]
+execute_process = "teraflashpy.__main__:app"
 
 [project.optional-dependencies]
 dev = ["pre-commit", "ruff", "ruff-lsp", "pyright"]
@@ -14,10 +17,13 @@ dev = ["pre-commit", "ruff", "ruff-lsp", "pyright"]
 requires = ["setuptools", "wheel"] # PEP 508 specifications.
 
 [tool.setuptools.packages.find]
-where = ["src/teraflashpy"]
+where = ["src"]
 
 [tool.ruff]
 line-length = 120
 ignore-init-module-imports = true
 select = ["ALL"]
 ignore = ["D"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["typer.Argument", "typer.params.Argument"]

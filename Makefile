@@ -5,7 +5,7 @@ SHELL := /bin/bash
 # GLOBALS                                                                       #
 #################################################################################
 
-PROJECT_NAME = orchestration
+PROJECT_NAME = src
 TEST_FOLDER = tests
 SYSTEM_PYTHON = python3
 VENV = .venv

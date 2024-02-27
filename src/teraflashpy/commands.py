@@ -5,6 +5,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
+from teraflashpy.states.system import SystemState, SystemStatus
+
 
 class Command(Enum):
     SystemStop = "SYSTEM : STOP"
@@ -82,7 +84,7 @@ class SystemMonitorInput(BaseModel):
 
 
 class LaserSetInput(BaseModel):
-    pump_current: Annotated[int, Field(ge=0, le=100)]
+    pump_current: Annotated[float, Field(ge=0, le=100)]
 
 
 class AcquisitionBeginInput(BaseModel):
@@ -93,7 +95,7 @@ class AcquisitionBeginInput(BaseModel):
     def check_is_divisible(cls: type[AcquisitionBeginInput], v: float) -> float:
         is_divisible = v % 0.1 == 0
         if not is_divisible:
-            msg = "Value must be divisible by 0.1"
+            msg = "start_position must be divisible by 0.1"
             raise ValidationError(msg)
         return v
 
@@ -106,10 +108,111 @@ class AcquisitionAverageInput(BaseModel):
     num_averages: Annotated[int, Field(ge=1, le=30000)]
 
 
-class CommandOutput(Enum):
+class NoInput(BaseModel):
+    ...
+
+
+CommandInput = (
+    SystemMonitorInput
+    | LaserSetInput
+    | AcquisitionBeginInput
+    | AcquisitionRangeInput
+    | AcquisitionAverageInput
+    | NoInput
+)
+
+
+# --------------------------------------- OUTPUTS ---------------------------------------
+
+
+# OUTPUT_TYPE_MAP = {
+#     Command.SystemTellStatus: SystemStatus,
+#     Command.SystemMonitor: float,
+# }
+# OUTPUT_TYPE_MAP = defaultdict(lambda: None, OUTPUT_TYPE_MAP)
+
+
+class CommandResult(Enum):
     Ok = "OK"
     Error = "ERROR"
     Parameter = "PARAM"
+
+
+# class CommandOutput(BaseModel):
+#     result: CommandResult
+#     state: SystemState
+#     value: Any
+
+# CommandT = TypeVar("CommandT")
+
+
+# CommandInput = BaseCommandInput
+
+
+# class GenericCommand(BaseModel, Generic[CommandT]):
+#     command: CommandT
+#     command_input: Annotated[CommandInput]
+
+
+def run(state: SystemState, command: Command, inputs: CommandInput):
+    match command:
+        case Command.SystemStop:
+            # output = run(command, inputs)
+            result: CommandResult = CommandResult.Ok
+            new_state = state.model_copy(update={"status": SystemStatus.Off}, deep=True)
+            value = None
+        case Command.SystemTellStatus:
+            result: CommandResult = CommandResult.Ok
+            new_state = state.model_copy(deep=True)
+            value = SystemStatus.On
+    match result:
+        case CommandResult.Ok:
+            return result, new_state, value
+        case CommandResult.Error:
+            msg = "asdfsafasfda"
+            raise Exception(msg)
+        case _:
+            msg = "CommandResult other than Ok or Error."
+            raise ValueError(msg)
+        # case Command.SystemMonitor:
+        #     return "TEST"
+        # case Command.SystemTiaFull:
+        #     return state.model_copy(
+        #         update={"state": {"laser_state": {"tia_status": TransImpedanceAmplifierStatus.Full}}},
+        #         deep=True,
+        #     )
+        # case Command.SystemTiaAtn1:
+        #     return state.model_copy(
+        #         update={"state": {"laser_state": {"tia_status": TransImpedanceAmplifierStatus.Medium}}},
+        #         deep=True,
+        #     )
+        # case Command.SystemTiaAtn2:
+        #     return state.model_copy(
+        #         update={"state": {"laser_state": {"tia_status": TransImpedanceAmplifierStatus.Small}}},
+        #         deep=True,
+        #     )
+        # case Command.LaserOff:
+        #     return state.model_copy(update={"state": {"laser_state": {"status": LaserStatus.Off}}}, deep=True)
+        # case Command.LaserOn:
+        #     return state.model_copy(update={"state": {"laser_state": {"status": LaserStatus.On}}}, deep=True)
+        # case Command.LaserSet:
+        #     pass
+        # case Command.AcquisitionBegin:
+        #     pass
+        # case Command.AcquisitionRange:
+        #     pass
+        # case Command.AcquisitionStop:
+        #     pass
+        # case Command.AcquisitionStart:
+        #     pass
+        # case Command.AcquisitionAverage:
+        #     pass
+        # case Command.AcquisitionResetAvg:
+        #     pass
+        # case Command.TransmissionSliding:
+        #     pass
+        # case Command.TransmissionBlock:
+        #     pass
 
 
 # message = "\n".join(["CDEF1234", "789AFEDC", "00000002", "????????", u32])

@@ -1,10 +1,11 @@
 import asyncio
 import socket
+import typing
 
 import numpy as np
-from core import Config
 
 from teraflashpy import ACQUISITION_PORT_MAP, LOCALHOST, AcquisitionMode, PulseData
+from teraflashpy.core import Config
 
 
 def _collect_pulse_data(acquisition_mode: AcquisitionMode) -> PulseData:
@@ -41,6 +42,8 @@ async def run(config: Config) -> PulseData:
             return collect_pulse_data()
         case AcquisitionMode.Asynchronous:
             return await collect_pulse_data_async()
+        case _:
+            typing.assert_never(config.acquisition_mode)
 
 
 if __name__ == "__main__":

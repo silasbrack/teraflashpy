@@ -5,7 +5,6 @@ from enum import Enum
 from pydantic import BaseModel
 
 LOCALHOST = "127.0.0.1"
-TERAFLASH_SERVER_IP = "169.254.84.101"
 
 
 class AcquisitionMode(Enum):
