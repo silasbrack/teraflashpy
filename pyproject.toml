@@ -21,6 +21,8 @@ where = ["src"]
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
 ignore-init-module-imports = true
 select = ["ALL"]
 ignore = ["D"]

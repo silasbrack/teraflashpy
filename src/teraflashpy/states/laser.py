@@ -5,9 +5,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
-# if TYPE_CHECKING:
-from teraflashpy.states.trans_impedance_amplifier import TransImpedanceAmplifierStatus
-from teraflashpy.states.transfer import TransferStatus
+from teraflashpy.states.trans_impedance_amplifier import TransImpedanceAmplifierStatus  # noqa: TCH001
+from teraflashpy.states.transfer import TransferStatus  # noqa: TCH001
 
 
 class LaserStatus(Enum):

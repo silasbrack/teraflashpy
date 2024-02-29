@@ -22,9 +22,9 @@ venv:
 ## Update dependencies in requirements files
 update-deps:
 	pre-commit autoupdate
-	$(PYTHON_INTERPRETER) -m pip install --upgrade pip wheel setuptools pip-tools
-	$(PYTHON_INTERPRETER) -m piptools compile --upgrade --resolver backtracking -o prod-requirements.txt pyproject.toml --allow-unsafe
-	$(PYTHON_INTERPRETER) -m piptools compile --extra dev --upgrade --resolver backtracking -o dev-requirements.txt pyproject.toml --allow-unsafe
+	$(PYTHON_INTERPRETER) -m pip install --upgrade pip wheel setuptools uv
+	$(PYTHON_INTERPRETER) -m uv pip compile --upgrade -o prod-requirements.txt pyproject.toml
+	$(PYTHON_INTERPRETER) -m uv pip compile --extra dev --upgrade -o dev-requirements.txt pyproject.toml
 
 ## Run linter
 lint:
@@ -45,8 +45,8 @@ test:
 
 ## Install and check dependencies
 init:
-	$(PYTHON_INTERPRETER) -m pip install --upgrade pip setuptools wheel pip-tools
-	$(PYTHON_INTERPRETER) -m piptools sync dev-requirements.txt prod-requirements.txt
+	$(PYTHON_INTERPRETER) -m pip install --upgrade pip setuptools wheel uv
+	$(PYTHON_INTERPRETER) -m uv pip sync dev-requirements.txt prod-requirements.txt
 	$(PYTHON_INTERPRETER) -m pip install --editable .
 	$(PYTHON_INTERPRETER) -m pip check
 
