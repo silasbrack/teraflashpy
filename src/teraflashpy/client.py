@@ -29,9 +29,9 @@ async def _collect_data(queue: Queue) -> None:
     except Exception:
         logger.exception(
             {
-                "length_data_bytes": length_data_bytes,
-                "length_data": length_data,
-                "pulse_data_bytes": pulse_data_bytes,
+                "length_data_bytes": length_data_bytes if "length_data_bytes" in locals() else None,
+                "length_data": length_data if "length_data" in locals() else None,
+                "pulse_data_bytes": pulse_data_bytes if "pulse_data_bytes" in locals() else None,
             },
         )
     finally:
