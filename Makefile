@@ -1,4 +1,4 @@
-.PHONY: update-deps init update venv lint format build
+.PHONY: install update upgrade venv lint format build
 SHELL := /bin/bash
 
 #################################################################################
@@ -19,7 +19,13 @@ venv:
 	$(SYSTEM_PYTHON) -m venv $(VENV)
 
 ## Update dependencies in requirements files
-update-deps:
+update:
+	$(PYTHON_INTERPRETER) -m pip install pip wheel setuptools uv
+	$(PYTHON_INTERPRETER) -m uv pip compile -o requirements/prod.txt pyproject.toml
+	$(PYTHON_INTERPRETER) -m uv pip compile --extra dev -o requirements/dev.txt pyproject.toml
+
+## Upgrade dependencies in requirements files
+upgrade:
 	pre-commit autoupdate
 	$(PYTHON_INTERPRETER) -m pip install --upgrade pip wheel setuptools uv
 	$(PYTHON_INTERPRETER) -m uv pip compile --upgrade -o requirements/prod.txt pyproject.toml
@@ -35,7 +41,7 @@ format:
 	$(PYTHON_INTERPRETER) -m ruff format $(PROJECT_NAME)
 
 ## Install and check dependencies
-init:
+install:
 	$(PYTHON_INTERPRETER) -m pip install --upgrade pip setuptools wheel uv
 	$(PYTHON_INTERPRETER) -m uv pip sync requirements/dev.txt requirements/prod.txt
 	$(PYTHON_INTERPRETER) -m pip install --editable .
@@ -44,9 +50,6 @@ init:
 ## Build wheel file to dist folder
 build:
 	$(PYTHON_INTERPRETER) -m build
-
-## Update package versions and install them
-update: update-deps init
 
 #################################################################################
 # Self Documenting Commands                                                     #
