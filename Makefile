@@ -1,4 +1,4 @@
-.PHONY: update-deps init update venv lint format test build
+.PHONY: update-deps init update venv lint format build
 SHELL := /bin/bash
 
 #################################################################################
@@ -6,7 +6,6 @@ SHELL := /bin/bash
 #################################################################################
 
 PROJECT_NAME = src
-TEST_FOLDER = tests
 SYSTEM_PYTHON = python3
 VENV = .venv
 PYTHON_INTERPRETER = ./$(VENV)/bin/python
@@ -23,40 +22,28 @@ venv:
 update-deps:
 	pre-commit autoupdate
 	$(PYTHON_INTERPRETER) -m pip install --upgrade pip wheel setuptools uv
-	$(PYTHON_INTERPRETER) -m uv pip compile --upgrade -o prod-requirements.txt pyproject.toml
-	$(PYTHON_INTERPRETER) -m uv pip compile --extra dev --upgrade -o dev-requirements.txt pyproject.toml
+	$(PYTHON_INTERPRETER) -m uv pip compile --upgrade -o requirements/prod.txt pyproject.toml
+	$(PYTHON_INTERPRETER) -m uv pip compile --extra dev --upgrade -o requirements/dev.txt pyproject.toml
 
 ## Run linter
 lint:
-	$(PYTHON_INTERPRETER) -m ruff $(PROJECT_NAME)
-	$(PYTHON_INTERPRETER) -m ruff $(TEST_FOLDER)
+	$(PYTHON_INTERPRETER) -m ruff check $(PROJECT_NAME)
 
 ## Run code formatters
 format:
-	$(PYTHON_INTERPRETER) -m ruff $(PROJECT_NAME) --fix
-	$(PYTHON_INTERPRETER) -m ruff $(TEST_FOLDER) --fix
-	$(PYTHON_INTERPRETER) -m black $(PROJECT_NAME)
-	$(PYTHON_INTERPRETER) -m black $(TEST_FOLDER)
-
-## Run tests
-test:
-	$(PYTHON_INTERPRETER) -m pytest $(TEST_FOLDER)
-	$(PYTHON_INTERPRETER) -m tox run
+	$(PYTHON_INTERPRETER) -m ruff check $(PROJECT_NAME) --fix
+	$(PYTHON_INTERPRETER) -m ruff format $(PROJECT_NAME)
 
 ## Install and check dependencies
 init:
 	$(PYTHON_INTERPRETER) -m pip install --upgrade pip setuptools wheel uv
-	$(PYTHON_INTERPRETER) -m uv pip sync dev-requirements.txt prod-requirements.txt
+	$(PYTHON_INTERPRETER) -m uv pip sync requirements/dev.txt requirements/prod.txt
 	$(PYTHON_INTERPRETER) -m pip install --editable .
 	$(PYTHON_INTERPRETER) -m pip check
 
 ## Build wheel file to dist folder
 build:
 	$(PYTHON_INTERPRETER) -m build
-
-## Run dagster
-run:
-	$(PYTHON_INTERPRETER) -m dagster dev
 
 ## Update package versions and install them
 update: update-deps init
