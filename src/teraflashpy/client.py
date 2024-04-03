@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 from datetime import datetime, timezone
 from multiprocessing import Process, Queue
+from queue import Empty
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -25,7 +27,9 @@ async def _collect_data(queue: Queue) -> None:
             length_data = int(length_data_bytes.decode("utf-8"))
             pulse_data_bytes = await reader.readexactly(length_data)
             timestamp = datetime.now(tz=timezone.utc)
-            queue.put((pulse_data_bytes, timestamp))
+            with contextlib.suppress(Empty):
+                queue.get_nowait()
+            queue.put_nowait((pulse_data_bytes, timestamp))
     except Exception:
         logger.exception(
             {
@@ -41,7 +45,7 @@ async def _collect_data(queue: Queue) -> None:
 
 class TeraflashProClient:
     def __enter__(self):
-        self.queue: Queue[tuple[bytes, datetime]] = Queue()
+        self.queue: Queue[tuple[bytes, datetime]] = Queue(maxsize=2)
         self.process = Process(target=self.run_backend, args=(self.queue,))
         self.process.start()
         return self
@@ -71,15 +75,7 @@ class TeraflashProClient:
 
         return header, time, magnitude
 
-    def _clear_queue(self) -> None:
-        while True:
-            if self.queue.empty():
-                break
-            self.queue.get_nowait()
-
     def read(self, num_pulses: int, timeout: int = 20) -> list[PulseData]:
-        self._clear_queue()
-
         pulses = []
         for _ in range(num_pulses):
             pulse_bytes, timestamp = self.queue.get(timeout=timeout)
